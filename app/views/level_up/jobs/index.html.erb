@@ -1,0 +1,73 @@
+<div class="container-12">
+  <div class="grid-12">
+    <div class="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li> /
+        <li>Jobs</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <div class="search-form">
+      <%= form_for @search, url: jobs_path, id: "search-form" do |f| %>
+        <%= f.text_field :key_contains, placeholder: "Search by key", class: "search-field" %>
+        <%= f.submit "Search", class: "search-button" %>
+        <div class="filters">
+          <%= f.label :delayed_job_id_eq, "Queued" %>:
+          <%= f.select :delayed_job_id_eq,
+                       options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:delayed_job_id_eq]) %>
+          <%= f.label :timer_eq, "Timer" %>:
+          <%= f.select :timer_eq,
+                       options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:timer_eq]) %>
+
+          <%= f.label :task_eq, "Task" %>:
+          <%= f.select :task_eq,
+                       options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:task_eq]) %>
+
+          <%= f.label :error_eq, "Error" %>:
+          <%= f.select :error_eq,
+                        options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:error_eq]) %>
+          <%= link_to "Reset filters", jobs_path, class: "reset-link" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  <div class="grid-12">
+    <%= paginate @jobs %>
+    <table class="table-bordered jobs">
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Type</th>
+          <th>State</th>
+          <th>Queued</th>
+          <th>Timer</th>
+          <th>Task</th>
+          <th>Error</th>
+          <th>Created at</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @jobs.each do |job| %>
+          <tr>
+            <td><%= link_to job.key, job_path(job) %></td>
+            <td><%= job.type %></td>
+            <td><%= job.state.humanize.downcase %></td>
+            <td><%= status_tag job.delayed_job, :purple %></td>
+            <td><%= status_tag job.timer, :blue %></td>
+            <td><%= status_tag job.task, :orange %></td>
+            <td><%= status_tag job.error, :red %></td>
+            <td><%= l(job.created_at, format: :long) %></td>
+          </tr>
+        <% end %>
+        <% if @jobs.empty? %>
+          <tr>
+            <td colspan="8">No jobs found</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= paginate @jobs %>
+  </div>
+</div>

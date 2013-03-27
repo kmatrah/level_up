@@ -1,0 +1,119 @@
+/*
+  Place all the styles related to the matching controller here.
+  They will automatically be included in application.css.
+*/
+
+#general-stats {
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+.job-status-stats {
+  margin-bottom: 20px;
+  background-color: #fafcfb;
+  border: 1px solid #d7d8d9;
+
+  .title {
+
+
+    h2 {
+      color: #fff;
+      font-weight: bold;
+      display: block;
+      padding: 10px;
+
+
+      border-bottom: 1px solid #f0f1f5;
+      background-color: #fff;
+      .bullet {
+        height: 10px;
+        width: 10px;
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .number {
+    font-size: 100px;
+    background-color: #fafbfb;
+    text-align: center;
+    border-bottom: 1px solid #f0f1f5;
+    a {
+      text-decoration: none;
+    }
+  }
+
+  &.queued {
+    h2 {
+     color: #482869;
+     .bullet {
+       background-color: #482869;
+     }
+    }
+    .number a {
+      color: #482869;
+    }
+  }
+
+  &.timer {
+    h2 {
+      color: #0048ac;
+      .bullet {
+        background-color: #0048ac;
+      }
+    }
+    .number a {
+      color: #0048ac;
+    }
+  }
+
+  &.task {
+    h2 {
+      color: #F89406;
+      .bullet {
+        background-color: #F89406;
+      }
+    }
+    .number a {
+      color: #F89406;
+    }
+  }
+
+  &.error {
+    h2 {
+      color: #b40d28;
+      .bullet {
+        background-color: #b40d28;
+      }
+    }
+    .number a {
+      color: #b40d28;
+    }
+  }
+
+  .stats {
+    border-top: #fdfefe;
+    background-color: #fafbfb;
+    padding: 5px;
+
+    li {
+      padding: 3px;
+      label {
+        display: inline-block;
+        width: 100px;
+      }
+
+      a, a:visited, a:hover {
+        color: #31353e;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+#job-metrics {
+  padding: 10px;
+}

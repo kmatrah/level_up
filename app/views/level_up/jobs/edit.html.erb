@@ -1,0 +1,65 @@
+<div class="container-12">
+  <div class="grid-12">
+    <div class="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li> /
+        <li><%= link_to "Jobs", jobs_path %></li> /
+        <li><%= link_to @job.key, job_path(@job) %></li> /
+        <li>Edit</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-8">
+    <div class="simple-panel job-details">
+      <h2><%= @job.class.name %> #<%= @job.id %></h2>
+      <%= form_for(:job, url: job_path(@job), method: :put) do |f| %>
+        <ul class="attributes-table form">
+          <li>
+            <%= f.label :key %>
+            <%= f.text_field :key %>
+          </li>
+          <li>
+            <%= f.label :state %>
+            <%= f.select :state, options_for_select(@job.states, @job.state) %>
+          </li>
+          <li>
+            <%= f.label :timer %>
+            <%= f.check_box :timer %>
+          </li>
+          <li>
+            <%= f.label :task %>
+            <%= f.check_box :task %>
+          </li>
+          <li>
+            <%= f.label :error %>
+            <%= f.check_box :error %>
+          </li>
+          <li>
+            <%= f.label :created_at %>
+            <%= f.datetime_select :created_at, include_seconds: true, include_blank: true%>
+          </li>
+          <li>
+            <%= f.label :updated_at %>
+            <%= f.datetime_select :updated_at, include_seconds: true, include_blank: true %>
+          </li>
+          <li>
+            <%= f.label :started_at %>
+            <%= f.datetime_select :started_at, include_seconds: true, include_blank: true %>
+          </li>
+          <li>
+            <%= f.label :ended_at %>
+            <%= f.datetime_select :ended_at, include_seconds: true, include_blank: true %>
+          </li>
+          <li>
+            <%= f.label :canceled_at %>
+            <%= f.datetime_select :canceled_at, include_seconds: true, include_blank: true %>
+          </li>
+          <li>
+            <%= f.submit "Update" %>
+          </li>
+        </ul>
+      <% end %>
+    </div>
+  </div>
+</div>

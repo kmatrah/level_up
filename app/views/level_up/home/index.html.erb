@@ -1,0 +1,85 @@
+<div class="container-12">
+  <div class="grid-6">
+    <div class="job-status-stats queued">
+      <div class="title"><h2><span class="bullet"></span>Queued</h2></div>
+      <div class="number"><%= link_to LevelUp::Job.queued.size, jobs_path(search: {delayed_job_id_eq: true}) %></div>
+      <div class="stats">
+        <ul>
+          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.queued.first) %></li>
+          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.queued.last) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-6">
+    <div class="job-status-stats timer">
+      <div class="title"><h2><span class="bullet"></span>Timer</h2></div>
+      <div class="number"><%= link_to LevelUp::Job.timer.size, jobs_path(search: {timer_eq: true}) %></div>
+      <div class="stats">
+        <ul>
+          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.timer.first) %></li>
+          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.timer.last) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-6">
+    <div class="job-status-stats task">
+      <div class="title"><h2><span class="bullet"></span>Task</h2></div>
+      <div class="number"><%= link_to LevelUp::Job.task.size, jobs_path(search: {task_eq: true}) %></div>
+      <div class="stats">
+        <ul>
+          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.task.first) %></li>
+          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.task.last) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-6">
+    <div class="job-status-stats error">
+      <div class="title"><h2><span class="bullet"></span>Error</h2></div>
+      <div class="number"><%= link_to LevelUp::Job.error.size, jobs_path(search: {error_eq: true}) %></div>
+      <div class="stats">
+        <ul>
+          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.error.first) %></li>
+          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.error.last) %></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <div class="simple-panel">
+      <h2>Job Metrics</h2>
+      <div id="job-metrics"></div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+<script type="text/javascript">
+  google.load("visualization", "1", {packages:["corechart"]});
+  google.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Date', 'Created', 'Started', 'Ended', 'Canceled'],
+      <% @metrics[:created].each do |date, count| %>
+      ['<%= date.split("-")[1..-1].reverse.join("/") %>', <%= count %>, <%= @metrics[:started][date] %>, <%= @metrics[:ended][date] %>, <%= @metrics[:canceled][date] %>],
+      <% end %>
+    ]);
+
+    var options = {
+      backgroundColor: '#fafbfb',
+      colors: ['#0048ac', '#482869', '#57a957', '#b40d28'],
+      fontName: 'Ubuntu'
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('job-metrics'));
+    chart.draw(data, options);
+  }
+</script>

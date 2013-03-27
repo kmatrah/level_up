@@ -1,0 +1,93 @@
+<div class="container-12">
+  <div class="grid-12">
+    <div class="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li> /
+        <li><%= link_to "Jobs", jobs_path %></li> /
+        <li><%= @job.key %></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-8">
+    <div class="simple-panel job-details">
+      <h2>Job details</h2>
+      <ul class="attributes-table">
+        <li><label>ID:</label><%= @job.id %></li>
+        <li><label>Key:</label><%= @job.key %></li>
+        <li><label>Type:</label><%= @job.type %></li>
+        <li><label>State:</label><%= @job.state.humanize.downcase %></li>
+        <li><label>Queued:</label><%= status_tag @job.delayed_job, :purple %></li>
+        <li><label>Timer:</label><%= status_tag @job.timer, :blue %></li>
+        <li><label>Task:</label><%= status_tag @job.task, :orange %></li>
+        <li><label>Error:</label><%= status_tag @job.error, :red %></li>
+        <li><label>Created at:</label><%= l(@job.created_at) %></li>
+        <li><label>Updated at:</label><%= l(@job.updated_at) %></li>
+        <li><label>Started at:</label><%= @job.started_at ? l(@job.started_at) : "-" %></li>
+        <li><label>Ended at:</label><%= @job.ended_at ? l(@job.ended_at) : "-" %></li>
+        <li><label>Canceled at:</label><%= @job.canceled_at ? l(@job.canceled_at) : "-" %></li>
+      </ul>
+    </div>
+
+    <% if @job.error? %>
+    <div class="simple-panel job-error-log">
+      <h2>Error Log</h2>
+      <ul class="attributes-table">
+        <li class="error"><label>Failed in</label><%= @job.failed_in %></li>
+        <li class="error"><label>Failed at</label><%= l(@job.failed_at) %></li>
+        <li class="error no-border"><label>Backtrace</label><%= @job.backtrace.first %></li>
+        <% @job.backtrace[1..-1].each do |trace| %>
+        <li class="no-border"><label></label><%= trace %></li>
+        <% end %>
+      </ul>
+    </div>
+    <% end %>
+  </div>
+
+  <div class="grid-4">
+    <div class="simple-panel job-commands">
+      <h2>Job commands</h2>
+      <% if @job.state?(:end) %>
+        Ended
+      <% elsif @job.queued? %>
+        <div class="command">
+          <%= form_tag unqueue_job_path(@job) do %>
+            <%= submit_tag "Unqueue" %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="command">
+          <%= form_tag run_job_path(@job) do %>
+            <%= submit_tag "Rerun the current state" %>
+          <% end %>
+        </div>
+        <div class="command">
+          <%= form_tag reboot_job_path(@job) do %>
+            <%= submit_tag "Reboot" %>
+          <% end %>
+        </div>
+        <% @job.state_transitions.each do |t| %>
+        <div class="command">
+          <%= form_tag move_job_path(@job, state: t) do %>
+            <% submit_tag "Move to: #{t.to_s.titleize}" %>
+          <% end %>
+        </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="job-actions">
+      <%= link_to "Edit", edit_job_path(@job), class: "action" %>
+      <%= link_to "Destroy", job_path(@job), method: :delete, class: "action delete", data: {confirm: "Are you sure?"} %>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <div class="simple-panel">
+      <h2>Job Flow</h2>
+      <div class="svg-graph">
+        <object id="svg-object" data="<%= graphviz_job_path(@job, format: :svg) %>" type="image/svg+xml"></object>
+      </div>
+    </div>
+  </div>
+</div>

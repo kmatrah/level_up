@@ -1,0 +1,23 @@
+<header>
+  <div class="top-bar">
+    <div class="container-12">
+      <div class="grid-2">
+        <h1>Level<span class="colored-part">Up</span></h1>
+      </div>
+      <div class="grid-3">
+        <ul>
+          <li><%= link_to "Dashboard", root_path, class: "app-link" %></li>
+          <li><%= link_to "Jobs", jobs_path, class: "app-link" %></li>
+        </ul>
+      </div>
+      <div class="grid-7">
+        <div class="search-bar">
+          <%= form_tag jobs_path, method: :get do %>
+            <%= text_field_tag 'search[key_contains]', nil, placeholder: "Search for jobs by key" %>
+            <%= submit_tag "Search" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

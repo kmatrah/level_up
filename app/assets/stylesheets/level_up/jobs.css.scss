@@ -1,0 +1,159 @@
+/*
+  Place all the styles related to the matching controller here.
+  They will automatically be included in application.css.
+*/
+
+.jobs {
+  tbody {
+    font-size: 14px;
+  }
+}
+.svg-graph {
+  text-align: center;
+  padding: 30px;
+}
+
+ul.attributes-table {
+  li {
+    padding: 10px;
+    border-bottom: 1px solid #f0f1f5;
+    border-top: 1px solid #fdfefe;
+
+    &:first-child {
+       border-top: 0;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+
+    label {
+      display: inline-block;
+      width: 150px;
+      font-weight: bold;
+    }
+
+    ul {
+      display: inline-block;
+    }
+  }
+}
+
+ul.attributes-table.form {
+  li {
+    line-height: 30px;
+    overflow: hidden;
+  }
+
+  input[type="text"] {
+    border: 1px solid #d1d1d1;
+    width: 500px;
+    padding: 7px 0;
+    padding-left: 5px;
+    display: inline-block;
+    margin: 0;
+    outline: none;
+  }
+
+  input[type="submit"] {
+    width: 25%;
+    display: block;
+    height: 30px;
+    background-color: #31353e;
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+    border: 1px solid #000;
+    border-radius: 3px;
+    text-shadow: 0px 1px #000;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: bold;
+
+  }
+}
+
+.job-error-log {
+  h2 {
+    color: #b40d28;
+  }
+
+  ul.attributes-table {
+    li {
+      &.no-border {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+.job-commands {
+  .command {
+    margin: 0;
+    border-bottom: 1px solid #f0f1f5;
+    border-top: 1px solid #fdfefe;
+
+    &:first-child {
+      border-top: 0;
+    }
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+  input[type="submit"] {
+    background-color: #fafbfb;
+    border: 0;
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 16px;
+    display: block;
+    margin: 0;
+    font-size: 14px;
+    color: #31353e;
+
+    &:hover {
+      background-color: #31353e;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+}
+
+.job-actions {
+  margin-bottom: 20px;
+
+
+
+  .action {
+    display: block;
+    padding: 15px;
+    text-decoration: none;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border: 1px solid #d7d8d9;
+    background-color: #fafbfb;
+    color: #31353e;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &:hover {
+      background-color: #31353e;
+      color: #fff;
+    }
+  }
+
+  .action.delete {
+    color: #b40d28;
+
+    &:hover {
+      background-color: #b40d28;
+      color: #fff;
+    }
+  }
+}
