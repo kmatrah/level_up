@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>LevelUp - Documentation</title>
+<meta name="viewport" content="width=device-width">
+<link type="text/css" rel="stylesheet" href="stylesheets/reset.css">
+<link type="text/css" rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.css">
+<link type="text/css" rel="stylesheet" href="stylesheets/documentation.css">
+
+<script src="javascripts/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="http://twitter.github.com/bootstrap/assets/js/google-code-prettify/prettify.js" type="text/javascript"></script>
+
+<!-- html5.js for IE less than 9 -->
+<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<!-- css3-mediaqueries.js for IE less than 9 -->
+<!--[if lt IE 9]>
+	<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>
+<![endif]-->
+
+</head>
+<body>
+
+<header>
+  <div class="top-bar"></div>
+</header>
+
+<div id="menu">
+  <nav>
+    <dl>
+      <dt><a href="#getting-started">Getting Started</a></dt>
+      <dd><a href="#include">Including LevelUp</a></dd>
+      <dd><a href="#migrations">Running migrations</a></dd>
+      <dd><a href="#mounting">Mounting the engine</a></dd>
+      <dd><a href="#authentication">Authentication</a></dd>
+
+      <dt><a href="#job-models">Job Models</a></dt>
+      <dd><a href="#states-transitions">States & Transitions</a></dd>
+      <dd><a href="#state-methods">State Methods</a></dd>
+      <dd><a href="#state-classes">State Classes</a></dd>
+      <dd><a href="#flow-control">Flow Control</a></dd>
+
+      <dt><a href="#running-jobs">Running Jobs</a></dt>
+      <dd><a href="#synchronously">Running synchronously</a></dd>
+      <dd><a href="#asynchronously">Running asynchronously</a></dd>
+
+      <dt><a href="#jobs-statuses">Jobs Statuses</a></dt>
+      <dd><a href="#queued">Queued</a></dd>
+      <dd><a href="#timer">Timer</a></dd>
+      <dd><a href="#task">Task</a></dd>
+      <dd><a href="#error">Error</a></dd>
+    </dl>
+  </nav>
+</div>
+
+<div id="content">
+  <h1>Level<em>Up</em> Documentation</h1>
+  <h2>Everything you need to know to build jobs using LevelUp</h2>
+  <p id="warning">Warning: this documentation is still being written. You can send feedback via email or via Github Issues.</p>
+
+  <section>
+    <h3 id="getting-started">Getting Started</h3>
+
+    <h4 id="include">&raquo; Including LevelUp</h4>
+    <p>Add LevelUp to your Gemfile:</p>
+    <pre class="prettyprint lang-ruby">gem 'level_up'</pre>
+    <p>and run <b>bundle install</b> within your app's directory.</p>
+
+    <h4 id="migrations">&raquo; Running Migrations</h4>
+    <p>First, make sure DelayedJob migration is installed. If not:</p>
+    <pre class="prettyprint lang-bash">$ rails g delayed_job:active_record</pre>
+    <p>Install and run LevelUp migration:</p>
+    <pre class="prettyprint lang-bash">
+$ rake level_up:install:migrations
+$ rake db:migrate</pre>
+
+    <h4 id="mounting">&raquo; Mounting the engine</h4>
+    <p>In your routes file:</p>
+    <pre class="prettyprint lang-ruby">
+# config/routes.rb
+Rails.application.routes.draw do
+  mount LevelUp::Engine => "/level_up"
+  # other routes ...
+end</pre>
+
+    <h4 id="authentication">&raquo; Authentication</h4>
+    <p>
+      LevelUp only provide basic http authentication through Rails 3.1+ <em>http_basic_authenticate_with</em> method. Authentication is disabled by
+      default. To enable it, add these lines in your config/environments/*.rb.
+    </p>
+    <pre class="prettyprint lang-ruby">
+config.level_up.http_authentication = true
+config.level_up.http_login = "your-login"
+config.level_up.http_password = "your-password"</pre>
+
+  </section>
+
+  <section>
+    <h3 id="job-models">Job Models</h3>
+    <h4 id="states-transitions">&raquo; States & Transitions</h4>
+    <pre class="prettyprint lang-ruby">
+# app/jobs/hard_job.rb
+class HardJob < LevelUp::Job
+  # states and transitions
+  job do
+    # you must declare a transition from the 'start' state
+    state :start, moves_to: :first_task
+
+    # 'first_task' declaration with one transition to 'second_task'
+    state :first_task, moves_to: :second_task
+
+    # 'second_task' declaration with two transitions
+    state :second_task, moves_to: [:third_task, :another_task]
+
+    # you must declare a transition to the 'end' state
+    state :third_task, moves_to: :end
+    state :another_task, moves_to: :end
+  end
+end</pre>
+    <h4 id="state-methods">&raquo; State Methods</h4>
+    <pre class="prettyprint lang-ruby">
+# app/jobs/hard_job.rb
+class HardJob < LevelUp::Job
+  job do
+    # ...
+  end
+
+  # states definition through methods
+
+  def first_task
+    # 'first_task' state logic goes here
+  end
+
+  def second_task
+    # 'second_task' state logic goes here
+  end
+
+  def third_task
+    # 'third_task' state logic goes here
+  end
+
+  def another_task
+    # 'another_task' state logic goes here
+  end
+end</pre>
+    <h4 id="state-classes">&raquo; State Classes</h4>
+    <p>You can also define state logic in a class instead of a method:</p>
+    <pre class="prettyprint lang-ruby">
+# app/jobs/hard_job/first_task.rb
+module HardJob
+  class FirstTask < LevelUp::State
+    def run
+      # 'first_task' state logic goes here
+    end
+  end
+end</pre>
+    <h4 id="flow-control">&raquo; Flow Control</h4>
+    <p>Inside a state, you can call 3 methods to control the job flow.</p>
+    <h5>+ move_to(state_name)</h5>
+    <p>Leave the current state and run the specified state:</p>
+    <pre class="prettyprint lang-ruby">
+def first_task
+  # ...
+  # at some point in 'first_task' state definition
+  move_to :second_task
+end</pre>
+    <h5>+ retry_in(delay)</h5>
+    <p>Stop the execution and queue a new delayed_job to re-run the current state after the specified delay in seconds:</p>
+    <pre class="prettyprint lang-ruby">
+def second_task
+  # ...
+  # at some point in 'second_task' state definition
+  retry_in 1.hour
+end</pre>
+    <h5>+ task(description)</h5>
+    <p>Stop the execution and set the task and task_description attributes to notify a manual human intervention.</p>
+    <pre class="prettyprint lang-ruby">
+def third_task
+  # ...
+  # at some point in 'third_task' state definition
+  task "task description goes here"
+end</pre>
+    <p>
+      You can also raise a StandardError (or a subclass) to stop the execution and set the error attribute.
+      The time, the state and the error backtrace will be saved.
+    </p>
+  </section>
+
+  <section>
+    <h3 id="running-jobs">Running Jobs</h3>
+    <p>In your controllers, models or also in other jobs</p>
+    <h4 id="synchronously">Running Synchronously</h4>
+    <p>Execute the job synchronously in the current thread</p>
+    <pre class="prettyprint lang-ruby">
+sync_job = HardJob.create(key: "job-key")
+sync_job.boot!</pre>
+    <h4 id="asynchronously">Running Asynchronously</h4>
+    <p>Execute the job asynchronously with a new delayed_job</p>
+    <pre class="prettyprint lang-ruby">
+async_job = HardJob.create(key: "job-key")
+async_job.boot_async!</pre>
+  </section>
+
+  <section>
+    <h3 id="job-statuses">Job Statuses</h3>
+    <h4 id="queued">Queued</h4>
+    <p>Being written.</p>
+    <h4 id="timer">Timer</h4>
+    <p>Being written.</p>
+    <h4 id="task">Task</h4>
+    <p>Being written.</p>
+    <h4 id="error">Error</h4>
+    <p>Being written.</p>
+  </section>
+</div>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-XXX-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+  $(function() {
+    prettyPrint();
+  });
+</script>
+
+</body>
+</html>

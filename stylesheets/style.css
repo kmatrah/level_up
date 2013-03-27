@@ -1,0 +1,217 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:400,500,700);
+
+body {
+    font-family: 'Ubuntu', sans-serif !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    background-color: #e9eaed;
+    color: #31353e;
+}
+
+header .top-bar {
+    background-color: #000;
+    border-top: 7px solid #3b5998;
+    border-bottom: 1px solid #666;
+}
+
+header .subtitle {
+    background: url("../images/inflicted.png");
+    border-bottom: 1px solid #000;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 70px;
+    margin: 0;
+    line-height: 80px;
+    text-transform: uppercase;
+    color: #fff;
+
+}
+
+header h1 em {
+    font-style: normal;
+    font-weight: bold;
+    color: #b40d28;
+}
+
+header h1 a, header h1 a:visited, header h1 a:hover {
+    color: inherit;
+}
+
+header h2 {
+    font-size: 30px;
+    margin: 0;
+    line-height: 50px;
+    color: #fff;
+    text-shadow: 0px 1px #000;
+}
+
+header h2 em {
+
+}
+
+.description, .keypoints {
+    border: 1px solid #d7d8d9;
+    margin: 0;
+    margin-bottom: 20px;
+    background-color: #fafbfb;
+    padding: 10px;
+}
+
+.keypoints p {
+    padding: 5px;
+    margin: 0;
+    font-size: 18px;
+    text-align: center;
+}
+
+.keypoints em {
+    border-bottom: 1px dotted #31353e;
+    font-weight: bold;
+}
+
+.keypoints .conclusion {
+    font-weight: bold;
+    color: #b40d28;
+}
+
+.description {
+    font-weight: bold;
+}
+
+nav {
+    color: #000;
+    padding: 10px;
+}
+
+nav ul {
+    list-style: inside disc none;
+    width: 100%;
+}
+
+nav a, nav a:visited {
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+
+}
+
+nav a:hover {
+    color: #b40d28;
+}
+
+.steps-description {
+    background-color: #3b5998;
+    color: #fff;
+    border: 1px solid #1a2643;
+    border-bottom: 0;
+    overflow: hidden;
+}
+
+.steps-description .step {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    width: 33%;
+    border-right: 1px solid #598dec;
+    padding: 10px;
+    float: left;
+    font-weight: bold;
+}
+
+.steps-description .step:last-child {
+    border: 0;
+}
+
+.steps-description .step .number {
+    color: #3b5998;
+    background-color: #fff;
+    padding: 3px 7px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.steps-details {
+    background-color: #fff;
+    border: 1px solid #d7d8d9;
+    border-top: 0;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.steps-details .step {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    height: 191px;
+    width: 33%;
+    border-right: 1px solid #d7d8d9;
+    padding: 10px;
+    float: left;
+}
+
+.steps-details pre {
+    font-family: 'Ubuntu', sans-serif !important;
+    font-size: 14px;
+}
+
+.prettyprint {
+    padding: 0;
+    background-color: #fff;
+    border: 0;
+    margin: 0;
+}
+
+.steps-details .step:last-child {
+    border: 0;
+}
+
+.steps-details .step img {
+    width: 100%;
+}
+
+.steps-description.last-step .step {
+    width: 100%;
+}
+
+.steps-details.last-step {
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #d7d8d9;
+}
+
+.bx-wrapper .bx-viewport {
+    box-shadow: none;
+}
+
+h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.changelog {
+    border: 1px solid #d7d8d9;
+    margin-bottom: 20px;
+    background-color: #fafbfb;
+    padding: 10px;
+}
+
+footer p {
+    border: 1px solid #d7d8d9;
+    margin-bottom: 20px;
+    background-color: #fafbfb;
+    padding: 10px;
+}
+
+footer p a, footer p a:visited {
+    color: #b40d28;
+}
+
+footer p a:hover {
+    text-decoration: underline;
+}
