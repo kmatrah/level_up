@@ -20,6 +20,10 @@ module LevelUp
         @schema ||= {}
       end
 
+      def state_classes
+        @state_classes ||= {}
+      end
+
       def states
         self.schema.keys
       end
@@ -35,6 +39,7 @@ module LevelUp
         options.reverse_merge!({moves_to: []})
         transitions = options[:moves_to].kind_of?(Symbol) ? Array(options[:moves_to]) : options[:moves_to]
         schema[name] = transitions
+        state_classes[name] = options[:class_name] if options.key?(:class_name)
       end
 
       def transitions(state)
@@ -152,17 +157,21 @@ module LevelUp
 
     protected
       def run_state(state_name, allow_transition, allow_retry)
-        if state_name and respond_to?(state_name)
+        state_name ||= state
+
+        if respond_to?(state_name)
           State.new(self, allow_transition, allow_retry).execute(self, state_name)
         else
-          state_class = if state?(:start)
+          state_class = if self.class.state_classes.key?(state_name.to_sym)
+            self.class.state_classes[state_name.to_sym].constantize
+          elsif state?(:start)
             State::Start
           elsif state?(:end)
             State::End
           elsif state?(:cancel)
             State::Cancel
           else
-            state_name ? next_state_class(state_name) : current_state_class
+            next_state_class(state_name)
           end
           state = state_class.new(self, allow_transition, allow_retry)
           state.execute(state, :run)

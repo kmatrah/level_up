@@ -18,6 +18,27 @@ module LevelUp
     end
   end
 
+  class CustomStateJob < LevelUp::Job
+    job do
+      state :start, class_name: "CustomNode", moves_to: :first_node
+      state :first_node, class_name: "CustomNode", moves_to: :end
+      state :cancel, class_name: "CustomNode"
+      state :end, class_name: "CustomNode"
+    end
+
+    def first_node
+    end
+  end
+
+  class CustomNodeError < StandardError
+  end
+
+  class CustomNode < LevelUp::State
+    def run
+      raise CustomNodeError.new("raised from state #{job.state}")
+    end
+  end
+
   class AbstractFirstNode < State
     def run
       move_to :second_node
@@ -47,8 +68,8 @@ module LevelUp
 
   class LevelUpTest < ActiveSupport::TestCase
     def setup
-      @job = TestJob.new
-      @job.save
+      @job = TestJob.create
+      @custom_state_job = CustomStateJob.create
     end
 
     test "should return the schema" do
@@ -203,6 +224,35 @@ module LevelUp
 
       @job.unqueue!
       assert_nil(@job.delayed_job_id)
+    end
+
+    test "should have custom state classes" do
+      assert_equal(true, @custom_state_job.class.state_classes.key?(:start))
+      assert_equal("CustomNode", @custom_state_job.class.state_classes[:start])
+      assert_equal(true, @custom_state_job.class.state_classes.key?(:first_node))
+      assert_equal("CustomNode", @custom_state_job.class.state_classes[:first_node])
+      assert_equal(true, @custom_state_job.class.state_classes.key?(:cancel))
+      assert_equal("CustomNode", @custom_state_job.class.state_classes[:cancel])
+      assert_equal(true, @custom_state_job.class.state_classes.key?(:end))
+      assert_equal("CustomNode", @custom_state_job.class.state_classes[:end])
+    end
+
+    test "should use the custom state and raise an error" do
+      %w[start end cancel].each do
+        @custom_state_job.clear!(nil)
+        assert_equal(false, @custom_state_job.error)
+        @custom_state_job.boot!
+        assert_equal(true, @custom_state_job.error)
+        assert_equal("start", @custom_state_job.failed_in)
+      end
+    end
+
+    test "should not use the custom state when a state method is defined" do
+      assert_equal(false, @custom_state_job.error)
+      @custom_state_job.state = "first_node"
+      @custom_state_job.boot!
+      assert_equal(false, @custom_state_job.error)
+      assert_equal(true, @custom_state_job.state?(:first_node))
     end
   end
 end
