@@ -160,6 +160,11 @@ nav a:hover {
     padding: 10px;
 }
 
+#content section p em {
+    font-style: normal;
+    font-weight: bold;
+}
+
 #content section pre {
     font-family: 'Ubuntu', sans-serif !important;
     font-size: 14px;
