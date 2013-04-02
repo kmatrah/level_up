@@ -2,6 +2,7 @@ module LevelUp
   class Configuration
     DEFAULT_HTTP_LOGIN = 'admin'
     DEFAULT_HTTP_PASSWORD = 'password'
+    DEFAULT_BACKTRACE_SIZE = 5
 
     def self.http_authentication
       @http_authentication ||= false
@@ -25,6 +26,14 @@ module LevelUp
 
     def self.http_password=(password)
       @http_password = password
+    end
+
+    def self.backtrace_size
+      @backtrace_size ||= DEFAULT_BACKTRACE_SIZE
+    end
+
+    def self.backtrace_size=(size)
+      @backtrace_size = size
     end
   end
 end

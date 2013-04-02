@@ -154,6 +154,28 @@ module LevelUp
       assert_not_nil(@job.backtrace)
     end
 
+    test "should set the backtrace attribute with the default backtrace size when rescuing from an error" do
+      @job.state = "error_node"
+      @job.boot!
+      assert_not_nil(@job.backtrace)
+      assert_equal(true, @job.backtrace.size <= Configuration::DEFAULT_BACKTRACE_SIZE)
+    end
+
+    test "should set the backtrace attribute with a custom backtrace size of 1 when rescuing from an error" do
+      Rails.configuration.level_up.backtrace_size = 1
+      @job.state = "error_node"
+      @job.boot!
+      assert_not_nil(@job.backtrace)
+      assert_equal(true, @job.backtrace.size <= Configuration.backtrace_size)
+    end
+
+    test "should not set the backtrace attribute with a custom backtrace size of 0 when rescuing from an error" do
+      Rails.configuration.level_up.backtrace_size = 0
+      @job.state = "error_node"
+      @job.boot!
+      assert_nil(@job.backtrace)
+    end
+
     test "should set the timer attribute when retrying a state" do
       assert_equal(false, @job.timer)
       assert_nil(@job.retry_at)

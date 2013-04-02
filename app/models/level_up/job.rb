@@ -199,7 +199,9 @@ module LevelUp
       def set_error_details(error)
         self.failed_at = DateTime.now.utc
         self.failed_in = state
-        self.backtrace = [error.message] | error.backtrace.take(5)
+        if Configuration.backtrace_size > 0
+          self.backtrace = [error.message] | error.backtrace.take(Configuration.backtrace_size - 1)
+        end
       end
 
       def clear_error_attributes
