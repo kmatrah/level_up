@@ -1,5 +1,8 @@
 module LevelUp
   class Configuration
+    DEFAULT_HTTP_LOGIN = 'admin'
+    DEFAULT_HTTP_PASSWORD = 'password'
+
     def self.http_authentication
       @http_authentication ||= false
     end
@@ -9,7 +12,7 @@ module LevelUp
     end
 
     def self.http_login
-      @http_login ||= 'admin'
+      @http_login ||= DEFAULT_HTTP_LOGIN
     end
 
     def self.http_login=(login)
@@ -17,7 +20,7 @@ module LevelUp
     end
 
     def self.http_password
-      @http_password ||= 'password'
+      @http_password ||= DEFAULT_HTTP_PASSWORD
     end
 
     def self.http_password=(password)
