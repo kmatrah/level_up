@@ -68,10 +68,10 @@ module LevelUp
 
     def move
       job = Job.find params[:id]
-      if job.boot_async!(params[:state])
-        redirect_to job_path(j), notice: "Moved to #{params[:state]}!"
+      if job.boot_async!(params[:task])
+        redirect_to job_path(job), notice: "Moved to #{params[:task]}!"
       else
-        flash[:error] = "Error while moving to #{params[:state]}"
+        flash[:error] = "Error while moving to #{params[:task]}"
         redirect_to job_path(job)
       end
     end
@@ -91,22 +91,21 @@ module LevelUp
       g.edge[:color] = '#000000'
       g.edge[:arrowhead] = 'open'
 
-      states = {}
-      job.states.each do |state|
-        states[state] = g.add_nodes(state.to_s.humanize.downcase)
-        if state == :start
-          states[state][:fillcolor] = '#5db1a4'
-          states[state][:color] = '#048282'
-
-        elsif state == :end
-          states[state][:fillcolor] = '#b40d28'
-          states[state][:color] = '#600615'
+      tasks = {}
+      job.tasks.each do |task|
+        tasks[task] = g.add_nodes(task.to_s.humanize.downcase)
+        if task == :start
+          tasks[task][:fillcolor] = '#5db1a4'
+          tasks[task][:color] = '#048282'
+        elsif task == :end
+          tasks[task][:fillcolor] = '#b40d28'
+          tasks[task][:color] = '#600615'
         end
       end
 
-      job.states.each do |state|
-        job.transitions(state).each do |transition|
-          g.add_edges(states[state], states[transition])
+      job.tasks.each do |task|
+        job.transitions(task).each do |transition|
+          g.add_edges(tasks[task], tasks[transition])
         end
       end
 

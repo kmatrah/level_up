@@ -21,9 +21,9 @@
           <%= f.select :timer_eq,
                        options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:timer_eq]) %>
 
-          <%= f.label :task_eq, "Task" %>:
-          <%= f.select :task_eq,
-                       options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:task_eq]) %>
+          <%= f.label :manual_task_eq, "Manual Task" %>:
+          <%= f.select :manual_task_eq,
+                       options_for_select([["Any", nil], ["Yes", true], ["No", false]], @search_params[:manual_task_eq]) %>
 
           <%= f.label :error_eq, "Error" %>:
           <%= f.select :error_eq,
@@ -40,10 +40,10 @@
         <tr>
           <th>Key</th>
           <th>Type</th>
-          <th>State</th>
+          <th>Task</th>
           <th>Queued</th>
           <th>Timer</th>
-          <th>Task</th>
+          <th>Manual Task</th>
           <th>Error</th>
           <th>Created at</th>
         </tr>
@@ -53,10 +53,10 @@
           <tr>
             <td><%= link_to job.key, job_path(job) %></td>
             <td><%= job.type %></td>
-            <td><%= job.state.humanize.downcase %></td>
+            <td><%= job.task.humanize.downcase %></td>
             <td><%= status_tag job.delayed_job, :purple %></td>
             <td><%= status_tag job.timer, :blue %></td>
-            <td><%= status_tag job.task, :orange %></td>
+            <td><%= status_tag job.manual_task, :orange %></td>
             <td><%= status_tag job.error, :red %></td>
             <td><%= l(job.created_at, format: :long) %></td>
           </tr>

@@ -16,10 +16,10 @@
         <li><label>ID:</label><%= @job.id %></li>
         <li><label>Key:</label><%= @job.key %></li>
         <li><label>Type:</label><%= @job.type %></li>
-        <li><label>State:</label><%= @job.state.humanize.downcase %></li>
+        <li><label>Task:</label><%= @job.task.humanize.downcase %></li>
         <li><label>Queued:</label><%= status_tag @job.delayed_job, :purple %></li>
         <li><label>Timer:</label><%= status_tag @job.timer, :blue %></li>
-        <li><label>Task:</label><%= status_tag @job.task, :orange %></li>
+        <li><label>Manual Task:</label><%= status_tag @job.manual_task, :orange %></li>
         <li><label>Error:</label><%= status_tag @job.error, :red %></li>
         <li><label>Created at:</label><%= l(@job.created_at) %></li>
         <li><label>Updated at:</label><%= l(@job.updated_at) %></li>
@@ -47,7 +47,7 @@
   <div class="grid-4">
     <div class="simple-panel job-commands">
       <h2>Job commands</h2>
-      <% if @job.state?(:end) %>
+      <% if @job.task?(:end) %>
         Ended
       <% elsif @job.queued? %>
         <div class="command">
@@ -58,7 +58,7 @@
       <% else %>
         <div class="command">
           <%= form_tag run_job_path(@job) do %>
-            <%= submit_tag "Rerun the current state" %>
+            <%= submit_tag "Rerun the current task" %>
           <% end %>
         </div>
         <div class="command">
@@ -66,9 +66,9 @@
             <%= submit_tag "Reboot" %>
           <% end %>
         </div>
-        <% @job.state_transitions.each do |t| %>
+        <% @job.task_transitions.each do |t| %>
         <div class="command">
-          <%= form_tag move_job_path(@job, state: t) do %>
+          <%= form_tag move_job_path(@job, task: t) do %>
             <% submit_tag "Move to: #{t.to_s.titleize}" %>
           <% end %>
         </div>

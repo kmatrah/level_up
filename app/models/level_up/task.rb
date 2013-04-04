@@ -1,5 +1,5 @@
 module LevelUp
-  class State
+  class Task
 
     attr_accessor :job, :allow_transition, :allow_retry
 
@@ -10,11 +10,11 @@ module LevelUp
     end
 
     def execute(receiver, method_name)
-      next_state = retry_params = task_description = nil
+      task_name = retry_params = task_description = nil
       ActiveRecord::Base.transaction do
-        next_state = catch(:move_to) do
+        task_name = catch(:move_to) do
           retry_params = catch(:retry_in) do
-            task_description = catch(:task) do
+            task_description = catch(:manual_task) do
               receiver.send(method_name)
               nil
             end
@@ -25,7 +25,7 @@ module LevelUp
       end
 
       if self.allow_transition
-        self.job.next_state = next_state
+        self.job.next_task = task_name
       end
 
       if retry_params and self.allow_retry
@@ -33,21 +33,21 @@ module LevelUp
       end
 
       if task_description
-        self.job.task = true
-        self.job.task_description = task_description
+        self.job.manual_task = true
+        self.job.manual_task_description = task_description
       end
     end
 
-    def move_to(state_name)
-      self.job.move_to(state_name)
+    def move_to!(task_name)
+      self.job.move_to!(task_name)
     end
 
-    def retry_in(delay, error=nil)
-      self.job.retry_in(delay, error)
+    def retry_in!(delay, error=nil)
+      self.job.retry_in!(delay, error)
     end
 
-    def manual_task(description)
-      self.job.manual_task(description)
+    def manual_task!(description)
+      self.job.manual_task!(description)
     end
   end
 end

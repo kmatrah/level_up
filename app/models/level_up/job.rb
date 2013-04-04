@@ -1,17 +1,19 @@
 module LevelUp
-  class StateNotFound < StandardError; end
+  class TaskNotFound < StandardError; end
 
   class Job < ActiveRecord::Base
 
-    attr_accessible :key, :state, :timer, :task, :error, :created_at, :updated_at, :started_at, :ended_at, :canceled_at
-    belongs_to :delayed_job, class_name: "::Delayed::Job"
+    attr_accessible :key, :task, :timer, :manual_task, :manual_task_description, :error,
+                    :created_at, :updated_at, :started_at, :ended_at, :canceled_at
 
-    attr_accessor :next_state
+    belongs_to :delayed_job, class_name: '::Delayed::Job'
 
-    scope :queued, lambda { where("delayed_job_id is not null") }
+    attr_accessor :next_task
+
+    scope :queued, lambda { where('delayed_job_id is not null') }
     scope :error, lambda { where(error: true) }
     scope :timer, lambda { where(timer: true) }
-    scope :task, lambda { where(task: true) }
+    scope :manual_task, lambda { where(manual_task: true) }
 
     serialize :backtrace
 
@@ -20,11 +22,11 @@ module LevelUp
         @schema ||= {}
       end
 
-      def state_classes
-        @state_classes ||= {}
+      def task_classes
+        @task_classes ||= {}
       end
 
-      def states
+      def tasks
         self.schema.keys
       end
 
@@ -35,18 +37,18 @@ module LevelUp
         end
       end
 
-      def state(name, options = {})
-        options.reverse_merge!({moves_to: []})
-        transitions = options[:moves_to].kind_of?(Symbol) ? Array(options[:moves_to]) : options[:moves_to]
+      def task(name, options = {})
+        options.reverse_merge!({transitions: []})
+        transitions = options[:transitions].kind_of?(Symbol) ? Array(options[:transitions]) : options[:transitions]
         schema[name] = transitions
-        state_classes[name] = options[:class_name] if options.key?(:class_name)
+        task_classes[name] = options[:class_name] if options.key?(:class_name)
       end
 
-      def transitions(state)
-        if self.schema.has_key?(state)
-          self.schema[state]
+      def transitions(task_name)
+        if self.schema.has_key?(task_name)
+          self.schema[task_name]
         else
-          raise StateNotFound, state
+          raise TaskNotFound, task_name
         end
       end
     end
@@ -60,8 +62,8 @@ module LevelUp
       clear!(event_name)
       step!(event_name, allow_transition, allow_retry)
 
-      if next_state
-        event!(next_state, allow_transition, allow_retry)
+      if next_task
+        event!(next_task, allow_transition, allow_retry)
       elsif retry_at
         retry!
       end
@@ -72,15 +74,15 @@ module LevelUp
       clear_error_attributes
       clear_task_attributes
 
-      self.next_state = nil
+      self.next_task = nil
       self.retry_at = nil
-      self.state = event_name if event_name
+      self.task = event_name if event_name
       save
     end
 
     def step!(event_name, allow_transition, allow_retry)
       begin
-        run_state(event_name, allow_transition, allow_retry)
+        run_task(event_name, allow_transition, allow_retry)
       rescue => ex
         set_error(ex)
       ensure
@@ -94,7 +96,7 @@ module LevelUp
       boot_async!(nil, run_at: retry_at)
     end
 
-    def boot_async!(event_name = nil, options = {})
+    def boot_async!(event_name=nil, options={})
       begin
         Delayed::Job.transaction do
           self.delayed_job = delay(options).event!(event_name)
@@ -115,8 +117,8 @@ module LevelUp
       save
     end
 
-    def state?(name)
-      self.state == name.to_s
+    def task?(name)
+      self.task == name.to_s
     end
 
     def cancellable?
@@ -127,63 +129,60 @@ module LevelUp
       !self.delayed_job.nil?
     end
 
-    def states
-      self.class.states
+    def tasks
+      self.class.tasks
     end
 
-    def transitions(state)
-      self.class.transitions(state)
+    def transitions(task_name)
+      self.class.transitions(task_name)
     end
 
-    def state_transitions
-      self.transitions(self.state.to_sym)
+    def task_transitions
+      self.transitions(self.task.to_sym)
     end
 
     def schema
       self.class.schema
     end
 
-    def move_to(state_name)
-      throw :move_to, state_name
+    def move_to!(task_name)
+      throw :move_to, task_name
     end
 
-    def retry_in(delay, error=nil)
+    def retry_in!(delay, error=nil)
       throw :retry_in, delay: delay, error: error
     end
 
-    def manual_task(description)
-      throw :task, description
+    def manual_task!(description)
+      throw :manual_task, description
     end
 
     protected
-      def run_state(state_name, allow_transition, allow_retry)
-        state_name ||= state
+      def run_task(task_name, allow_transition, allow_retry)
+        task_name ||= self.task
 
-        if respond_to?(state_name)
-          State.new(self, allow_transition, allow_retry).execute(self, state_name)
+        if respond_to?(task_name)
+          Task.new(self, allow_transition, allow_retry).execute(self, task_name)
         else
-          state_class = if self.class.state_classes.key?(state_name.to_sym)
-            self.class.state_classes[state_name.to_sym].constantize
-          elsif state?(:start)
-            State::Start
-          elsif state?(:end)
-            State::End
-          elsif state?(:cancel)
-            State::Cancel
+          task_class = if self.class.task_classes.key?(task_name.to_sym)
+            self.class.task_classes[task_name.to_sym].constantize
+          elsif task?(:start)
+            Task::Start
+          elsif task?(:end)
+            Task::End
+          elsif task?(:cancel)
+            Task::Cancel
           else
-            next_state_class(state_name)
+            next_task_class(task_name)
           end
-          state = state_class.new(self, allow_transition, allow_retry)
-          state.execute(state, :run)
+
+          task_instance = task_class.new(self, allow_transition, allow_retry)
+          task_instance.execute(task_instance, :run)
         end
       end
 
-      def current_state_class
-        "#{self.class.name}::#{state.camelize}".constantize
-      end
-
-      def next_state_class(state_name)
-        "#{self.class.name}::#{state_name.camelize}".constantize
+      def next_task_class(task_name)
+        "#{self.class.name}::#{task_name.camelize}".constantize
       end
 
       def set_error(error=nil)
@@ -198,7 +197,7 @@ module LevelUp
 
       def set_error_details(error)
         self.failed_at = DateTime.now.utc
-        self.failed_in = state
+        self.failed_in = self.task
         if Configuration.backtrace_size > 0
           self.backtrace = [error.message] | error.backtrace.take(Configuration.backtrace_size - 1)
         end
@@ -216,8 +215,8 @@ module LevelUp
       end
 
       def clear_task_attributes
-        self.task = false
-        self.task_description = nil
+        self.manual_task = false
+        self.manual_task_description = nil
       end
   end
 end

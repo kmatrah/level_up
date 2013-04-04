@@ -20,16 +20,16 @@
             <%= f.text_field :key %>
           </li>
           <li>
-            <%= f.label :state %>
-            <%= f.select :state, options_for_select(@job.states, @job.state) %>
+            <%= f.label :task %>
+            <%= f.select :task, options_for_select(@job.tasks, @job.task) %>
           </li>
           <li>
             <%= f.label :timer %>
             <%= f.check_box :timer %>
           </li>
           <li>
-            <%= f.label :task %>
-            <%= f.check_box :task %>
+            <%= f.label :manual_task %>
+            <%= f.check_box :manual_task %>
           </li>
           <li>
             <%= f.label :error %>

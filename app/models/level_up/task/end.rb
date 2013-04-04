@@ -1,5 +1,5 @@
 module LevelUp
-  class State::End < LevelUp::State
+  class Task::End < LevelUp::Task
     def run
       job.ended_at = DateTime.now.utc
     end

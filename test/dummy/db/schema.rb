@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130215111404) do
+ActiveRecord::Schema.define(:version => 20130404201329) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -33,11 +33,11 @@ ActiveRecord::Schema.define(:version => 20130215111404) do
     t.string   "type"
     t.integer  "delayed_job_id"
     t.string   "key"
-    t.string   "state",            :default => "start"
-    t.boolean  "error",            :default => false
-    t.boolean  "timer",            :default => false
-    t.boolean  "task",             :default => false
-    t.text     "task_description"
+    t.string   "task",                    :default => "start"
+    t.boolean  "error",                   :default => false
+    t.boolean  "timer",                   :default => false
+    t.boolean  "manual_task",             :default => false
+    t.text     "manual_task_description"
     t.datetime "failed_at"
     t.string   "failed_in"
     t.text     "backtrace"
@@ -45,13 +45,13 @@ ActiveRecord::Schema.define(:version => 20130215111404) do
     t.datetime "ended_at"
     t.datetime "canceled_at"
     t.datetime "retry_at"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
   end
 
   add_index "level_up_jobs", ["delayed_job_id"], :name => "index_level_up_jobs_on_delayed_job_id"
   add_index "level_up_jobs", ["key"], :name => "index_level_up_jobs_on_key"
-  add_index "level_up_jobs", ["state"], :name => "index_level_up_jobs_on_state"
+  add_index "level_up_jobs", ["task"], :name => "index_level_up_jobs_on_task"
   add_index "level_up_jobs", ["type"], :name => "index_level_up_jobs_on_type"
 
 end

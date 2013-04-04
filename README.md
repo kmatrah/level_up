@@ -5,17 +5,17 @@
 ## What ?
 
 If you are building a web app, chances are good you have some jobs to design and execute in order to provide services to your customers.
-Generally, that means handling automated tasks, manual human tasks, calls to external services, failures, timers and retries.
-LevelUp lets you build all of these and compose them to create a runnable job. Concretely, you will define a state graph, where each state
-represents a task and contains its own business logic implemented in ruby. Jobs can be performed synchronously in the
-current thread or asynchronously by background workers. Three methods are available in each state to control the job flow: move_to(new_state), retry_in(delay), manual_task(task_description).
+Generally, that means handling computer-based or manual tasks, calls to external services, failures, timers and retries.
+LevelUp lets you build all of these and compose them to create a runnable job. Concretely, you will define a task graph, where each task contains
+its own business logic implemented in ruby. Jobs can be performed synchronously in the current thread or asynchronously by background workers.
+Three methods are available in each state to control the job flow: move_to!(task_name), retry_in!(delay), manual_task!(task_description).
 
 ## Why use LevelUp ?
 
-Designing your jobs graphically with states and transitions can be more easier than directly writing code, especially for non-technical people.
+Designing your jobs graphically with tasks and transitions can be more easier than directly writing code, especially for non-technical people.
 Graphs can be drawn, printed, shared and analysed making it easier to let everyone know what the system is doing at specific points in time.
-From a developers point of view, it’s clearer to separate the different parts of a job into isolated states. Class based states are reusable
-in multiple jobs to avoid code duplication. For example, you can use the Template design pattern to implement the generic part of a state
+From a developers point of view, it’s clearer to separate the different parts of a job into isolated states. Class-based tasks are reusable
+in multiple jobs to avoid code duplication. For example, you can use the Template design pattern to implement the generic part of a task
 in a parent class and implement specialized parts in children classes.
 
 ## Requirements
@@ -71,13 +71,13 @@ config.level_up.http_password = "your-password"
 ## Writing Job Models
 
 ```ruby
-# app/jobs/hard_job.rb
+# app/models/hard_job.rb
 class HardJob < LevelUp::Job
-  # states and transitions
+  # tasks and transitions
   job do
-    state :start, moves_to: :first_task
-    state :first_task, moves_to: :second_task
-    state :second_task, moves_to: :end
+    task :start, transitions: :first_task
+    task :first_task, transitions: :second_task
+    task :second_task, transitions: :end
   end
 
   def first_task
@@ -90,14 +90,14 @@ class HardJob < LevelUp::Job
 end
 ```
 
-### State objects
+### Task classes
 
-You can also define state logic in a class instead of a method.
+You can also define task logic in a class instead of a method.
 
 ```ruby
-app/jobs/hard_job/first_task.rb
+app/models/hard_job/first_task.rb
 module HardJob
-  class FirstTask < LevelUp::State
+  class FirstTask < LevelUp::Task
     def run
       # logic goes here
     end
@@ -106,9 +106,9 @@ end
 ```
 
 ```ruby
-app/jobs/hard_job/second_task.rb
+app/models/hard_job/second_task.rb
 module HardJob
-  class SecondTask < LevelUp::State
+  class SecondTask < LevelUp::Task
     def run
       # logic goes here
     end
@@ -118,35 +118,35 @@ end
 
 ### Flow control
 
-Inside a state, you can call 3 methods to control the job flow:
+Inside a task, you can call 3 methods to control the job flow:
 
-#### move_to(state_name)
+#### move_to!(task_name)
 
-Leave the current state and run the specified state.
+Leave the current task and run the specified one.
 ```ruby
 # example:
-move_to :second_task
+move_to! :second_task
 ```
 
-#### retry_in(delay)
+#### retry_in!(delay)
 
-Stop the execution and queue a new delayed_job to re-run the current state after the specified delay in seconds.
+Stop the execution and enqueue a new delayed_job to re-run the current task after the specified delay in seconds.
 
 ```ruby
 # example:
-retry_in 1.hour
+retry_in! 1.hour
 ```
 
-#### task(description)
-Stop the execution and set the task and task_description attributes to notify a manual human intervention.
+#### manual_task!(description)
+Stop the execution and set the manual_task and manual_task_description attributes to notify that some work need to be done manually.
 
 ```ruby
 # example:
-task "check payment information"
+manual_task! "check payment information"
 ```
 
 You can also raise a StandardError (or a subclass) to stop the execution and set the error attribute.
-The time, the state and the error backtrace will be saved.
+The time, the task and the error backtrace will be saved.
 
 ## Running Jobs
 In your code:

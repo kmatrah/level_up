@@ -27,12 +27,12 @@
 
   <div class="grid-6">
     <div class="job-status-stats task">
-      <div class="title"><h2><span class="bullet"></span>Task</h2></div>
-      <div class="number"><%= link_to LevelUp::Job.task.size, jobs_path(search: {task_eq: true}) %></div>
+      <div class="title"><h2><span class="bullet"></span>Manual Task</h2></div>
+      <div class="number"><%= link_to LevelUp::Job.manual_task.size, jobs_path(search: {manual_task_eq: true}) %></div>
       <div class="stats">
         <ul>
-          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.task.first) %></li>
-          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.task.last) %></li>
+          <li><label>Most recent:</label><%= job_entry(LevelUp::Job.manual_task.first) %></li>
+          <li><label>Oldest:</label><%= job_entry(LevelUp::Job.manual_task.last) %></li>
         </ul>
       </div>
     </div>

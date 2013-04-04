@@ -5,11 +5,11 @@ class CreateLevelUpJobs < ActiveRecord::Migration
       t.string :type
       t.integer :delayed_job_id
       t.string :key
-      t.string :state, default: "start"
+      t.string :task, default: 'start'
       t.boolean :error, default: false
       t.boolean :timer, default: false
-      t.boolean :task, default: false
-      t.text :task_description
+      t.boolean :manual_task, default: false
+      t.text :manual_task_description
       t.datetime :failed_at
       t.string :failed_in
       t.text :backtrace
@@ -22,7 +22,7 @@ class CreateLevelUpJobs < ActiveRecord::Migration
 
     add_index :level_up_jobs, :type
     add_index :level_up_jobs, :delayed_job_id
-    add_index :level_up_jobs, :state
+    add_index :level_up_jobs, :task
     add_index :level_up_jobs, :key
   end
 end
