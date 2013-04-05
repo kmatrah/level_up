@@ -201,6 +201,18 @@ h3 {
     padding: 10px;
 }
 
+.changelog ul {
+    margin-bottom: 20px;
+}
+
+.changelog ul li:first-child {
+    font-weight: bold;
+}
+
+.changelog ul:last-child {
+    margin-bottom: 0;
+}
+
 footer p {
     border: 1px solid #d7d8d9;
     margin-bottom: 20px;
