@@ -78,7 +78,7 @@
   <div class="grid_12">
     <p class="description">
       LevelUp lets you build different kinds of tasks and compose them to create a runnable job.
-      Define state graphs where each state contains its own business logic implemented in ruby.
+      Define task graphs where each task contains its own business logic implemented in ruby.
       Jobs can be performed synchronously or asynchronously by background workers.
     </p>
 
@@ -90,20 +90,20 @@
     <div class="steps-details">
       <div class="step">
 <pre class="prettyprint lang-ruby">
-# app/jobs/hard_job.rb
+# app/models/hard_job.rb
 class HardJob < LevelUp::Job
   job do
-    state: :start, moves_to: first_state
-    state: :first_state, moves_to: :second_state
-    state: :second_state, moves_to: :end
+    task: :start, transitions: first_task
+    task: :first_task, transitions: :second_task
+    task: :second_task, transitions: :end
   end
 end</pre>
       </div>
       <div class="step">
 <pre class="prettyprint lang-ruby">
-# app/jobs/my_job/first_state.rb
+# app/models/hard_job/first_task.rb
 module HardJob
-  class FirstState < LevelUp::State
+  class FirstTask < LevelUp::Task
     def run
       puts "Doing hard work"
     end
