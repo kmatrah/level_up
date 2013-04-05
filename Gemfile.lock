@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    level_up (0.1.0)
+    level_up (0.2.0)
       delayed_job (~> 3.0)
       delayed_job_active_record (~> 0.3)
       jquery-rails
