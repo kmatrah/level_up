@@ -49,7 +49,7 @@
 
       <dt><a href="#core-concepts">Core Concepts</a></dt>
       <dd><a href="#jobs">Jobs</a></dd>
-      <dd><a href="#states">States</a></dd>
+      <dd><a href="#tasks">Tasks</a></dd>
       <dd><a href="#transitions">Transitions</a></dd>
       <dd><a href="#timers">Timers</a></dd>
       <dd><a href="#manual-tasks">Manual Tasks</a></dd>
@@ -58,9 +58,9 @@
 
 
       <dt><a href="#job-models">Job Models</a></dt>
-      <dd><a href="#states-transitions">States & Transitions</a></dd>
-      <dd><a href="#state-methods">State Methods</a></dd>
-      <dd><a href="#state-classes">State Classes</a></dd>
+      <dd><a href="#tasks-transitions">Tasks & Transitions</a></dd>
+      <dd><a href="#task-methods">Task Methods</a></dd>
+      <dd><a href="#task-classes">Task Classes</a></dd>
       <dd><a href="#flow-control">Flow Control</a></dd>
 
       <dt><a href="#running-jobs">Running Jobs</a></dt>
@@ -70,7 +70,7 @@
       <dt><a href="#jobs-statuses">Jobs Statuses</a></dt>
       <dd><a href="#queued">Queued</a></dd>
       <dd><a href="#timer">Timer</a></dd>
-      <dd><a href="#task">Task</a></dd>
+      <dd><a href="#manual-task">Manual Task</a></dd>
       <dd><a href="#error">Error</a></dd>
     </dl>
   </nav>
@@ -87,18 +87,18 @@
     <h4 id="what">&raquo; What is it?</h4>
     <p>
       If you are building a web app, chances are good you have some jobs to design and execute in order to provide services to your customers.
-      Generally, that means handling automated tasks, manual human tasks, calls to external services, failures, timers and retries.
-      LevelUp lets you build all of these and compose them to create a runnable job. Concretely, you will define a state graph, where each state represents
-      a task and contains its own business logic implemented in ruby. Jobs can be performed synchronously in the current thread or asynchronously
-      by background workers. Three methods are available in each state to control the job flow: move_to(new_state), retry_in(delay), manual_task(description).
+      Generally, that means handling computer-based or manual tasks, calls to external services, failures, timers and retries.
+      LevelUp lets you build all of these and compose them to create a runnable job. Concretely, you will define a task graph, where each task contains its own business
+      logic implemented in ruby. Jobs can be performed synchronously in the current thread or asynchronously by background workers.
+      Three methods are available in each state to control the job flow: move_to!(task_name), retry_in!(delay), manual_task!(task_description).
     </p>
 
     <h4 id="why">&raquo; Why use graphs?</h4>
     <p>
-      Designing your jobs graphically with states and transitions can be more easier than directly writing code, especially for non-technical people.
+      Designing your jobs graphically with tasks and transitions can be more easier than directly writing code, especially for non-technical people.
       Graphs can be drawn, printed, shared and analysed making it easier to let everyone know what the system is doing at specific points in time.
-      From a developers point of view, it’s clearer to separate the different parts of a job into isolated states. Class based states are reusable in multiple jobs
-      to avoid code duplication. For example, you can use the Template design pattern to implement the generic part of a state in a parent class and implement
+      From a developers point of view, it’s clearer to separate the different parts of a job into isolated tasks. Class-based tasks are reusable in multiple jobs
+      to avoid code duplication. For example, you can use the Template design pattern to implement the generic part of a task in a parent class and implement
       specialized parts in children classes.
     </p>
   </section>
@@ -146,7 +146,7 @@ config.level_up.http_password = "your-password"</pre>
     <h4 id="jobs">&raquo; Jobs</h4>
     <p>Being written.</p>
 
-    <h4 id="states">&raquo; States</h4>
+    <h4 id="tasks">&raquo; Tasks</h4>
     <p>Being written.</p>
 
     <h4 id="transitions">&raquo; Transitions</h4>
@@ -167,35 +167,35 @@ config.level_up.http_password = "your-password"</pre>
 
   <section>
     <h3 id="job-models">Job Models</h3>
-    <h4 id="states-transitions">&raquo; States & Transitions</h4>
+    <h4 id="tasks-transitions">&raquo; Tasks & Transitions</h4>
     <pre class="prettyprint lang-ruby">
-# app/jobs/hard_job.rb
+# app/models/hard_job.rb
 class HardJob < LevelUp::Job
-  # states and transitions
+  # tasks and transitions
   job do
     # you must declare a transition from the 'start' state
-    state :start, moves_to: :first_task
+    task :start, transitions: :first_task
 
     # 'first_task' declaration with one transition to 'second_task'
-    state :first_task, moves_to: :second_task
+    task :first_task, transitions: :second_task
 
     # 'second_task' declaration with two transitions
-    state :second_task, moves_to: [:third_task, :another_task]
+    task :second_task, transitions: [:third_task, :another_task]
 
     # you must declare a transition to the 'end' state
-    state :third_task, moves_to: :end
-    state :another_task, moves_to: :end
+    task :third_task, transitions: :end
+    task :another_task, transitions: :end
   end
 end</pre>
-    <h4 id="state-methods">&raquo; State Methods</h4>
+    <h4 id="task-methods">&raquo; Task Methods</h4>
     <pre class="prettyprint lang-ruby">
-# app/jobs/hard_job.rb
+# app/models/hard_job.rb
 class HardJob < LevelUp::Job
   job do
     # ...
   end
 
-  # states definition through methods
+  # task definition through methods
 
   def first_task
     # 'first_task' state logic goes here
@@ -213,46 +213,46 @@ class HardJob < LevelUp::Job
     # 'another_task' state logic goes here
   end
 end</pre>
-    <h4 id="state-classes">&raquo; State Classes</h4>
-    <p>You can also define state logic in a class instead of a method:</p>
+    <h4 id="task-classes">&raquo; State Classes</h4>
+    <p>You can also define task logic in a class instead of a method:</p>
     <pre class="prettyprint lang-ruby">
-# app/jobs/hard_job/first_task.rb
+# app/models/hard_job/first_task.rb
 module HardJob
-  class FirstTask < LevelUp::State
+  class FirstTask < LevelUp::Task
     def run
       # 'first_task' state logic goes here
     end
   end
 end</pre>
     <h4 id="flow-control">&raquo; Flow Control</h4>
-    <p>Inside a state, you can call 3 methods to control the job flow.</p>
-    <h5>+ move_to(state_name)</h5>
-    <p>Leave the current state and run the specified state:</p>
+    <p>Inside a task, you can call 3 methods to control the job flow.</p>
+    <h5>+ move_to!(task_name)</h5>
+    <p>Leave the current task and run the specified one:</p>
     <pre class="prettyprint lang-ruby">
 def first_task
   # ...
-  # at some point in 'first_task' state definition
-  move_to :second_task
+  # at some point in 'first_task' task definition
+  move_to! :second_task
 end</pre>
-    <h5>+ retry_in(delay)</h5>
-    <p>Stop the execution and queue a new delayed_job to re-run the current state after the specified delay in seconds:</p>
+    <h5>+ retry_in!(delay)</h5>
+    <p>Stop the execution and queue a new delayed_job to re-run the current task after the specified delay in seconds:</p>
     <pre class="prettyprint lang-ruby">
 def second_task
   # ...
-  # at some point in 'second_task' state definition
-  retry_in 1.hour
+  # at some point in 'second_task' task definition
+  retry_in! 1.hour
 end</pre>
-    <h5>+ task(description)</h5>
-    <p>Stop the execution and set the task and task_description attributes to notify a manual human intervention.</p>
+    <h5>+ manual_task!(description)</h5>
+    <p>Stop the execution and set the manual_task and manual_task_description attributes to notify that a manual human intervention is needed.</p>
     <pre class="prettyprint lang-ruby">
 def third_task
   # ...
-  # at some point in 'third_task' state definition
-  task "task description goes here"
+  # at some point in 'third_task' task definition
+  manual_task! "task description goes here"
 end</pre>
     <p>
       You can also raise a StandardError (or a subclass) to stop the execution and set the error attribute.
-      The time, the state and the error backtrace will be saved.
+      The time, the task and the error backtrace will be saved.
     </p>
   </section>
 
@@ -285,7 +285,7 @@ job.boot_async!
     <h4 id="timer">Timer</h4>
     <p>
       The <em>timer</em> attribute indicates whether or not a <em>delayed_job</em> has been pushed into the queue to be consumed by a worker at a <em>specific time</em>.
-      This happens when you call the <em>retry_in(delay)</em> method inside a state. The <em>retry_at</em> attribute indicates the time when the job will be ready to be consumed.
+      This happens when you call the <em>retry_in!(delay)</em> method inside a task. The <em>retry_at</em> attribute indicates the time when the job will be ready to be consumed.
       Before that time, you can manually remove the job from the queue calling its <em>unqueue!</em> method.
     </p>
     <pre class="prettyprint lang-ruby">
@@ -293,14 +293,14 @@ job.boot_async!
 job.unqueue!</pre>
     <h4 id="task">Task</h4>
     <p>
-      The <em>task</em> attribute indicates whether or not there is a <em>manual human task</em> to accomplish. The <em>task_description</em> attribute provides details about
-      what is expected to be done. Inherently, if the <em>task</em> attribute is equal to <em>true</em>, there is no delayed_job in the queue.
-      The job is suspended waiting for a human intervention. This happens when you call the <em>manual_task(description)</em> method inside a state.
+      The <em>manual_task</em> attribute indicates whether or not there is a <em>manual human task</em> to accomplish. The <em>manual_task_description</em> attribute provides details about
+      what is expected to be done. Inherently, if the <em>manual_task</em> attribute is equal to <em>true</em>, there is no delayed_job in the queue.
+      The job is suspended waiting for a human intervention. This happens when you call the <em>manual_task!(description)</em> method inside a task.
     </p>
     <h4 id="error">Error</h4>
     <p>
-      The <em>error</em> attribute indicates whether or not an error has been raised and not rescued when running a state. In this case, the error is rescued at the job level.
-      The <em>failed_in</em>, <em>failed_at</em> and <em>backtrace</em> attributes save the state where the error has been raised, the time and the first five elements of the backtrace error
+      The <em>error</em> attribute indicates whether or not an error has been raised and not rescued when running a task. In this case, the error is rescued at the job level.
+      The <em>failed_in</em>, <em>failed_at</em> and <em>backtrace</em> attributes save the task where the error has been raised, the time and the first five elements of the backtrace error
       (the backtrace is serialized as an array of strings in the database).
     </p>
     <pre class="prettyprint lang-ruby">
