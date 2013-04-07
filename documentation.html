@@ -45,7 +45,6 @@
       <dd><a href="#include">Including LevelUp</a></dd>
       <dd><a href="#migrations">Running migrations</a></dd>
       <dd><a href="#mounting">Mounting the engine</a></dd>
-      <dd><a href="#authentication">Authentication</a></dd>
 
       <dt><a href="#core-concepts">Core Concepts</a></dt>
       <dd><a href="#jobs">Jobs</a></dd>
@@ -72,6 +71,10 @@
       <dd><a href="#timer">Timer</a></dd>
       <dd><a href="#manual-task">Manual Task</a></dd>
       <dd><a href="#error">Error</a></dd>
+
+      <dt><a href="#configuration">Configuration</a></dt>
+      <dd><a href="#authentication">Authentication</a></dd>
+      <dd><a href="#backtrace-size">Backtrace Size</a></dd>
     </dl>
   </nav>
 </div>
@@ -79,7 +82,7 @@
 <div id="content">
   <h1>Level<em>Up</em> Documentation</h1>
   <h2>Everything you need to know to build jobs using LevelUp</h2>
-  <p id="warning">Warning: this documentation is still being written. You can send feedback via email or via Github Issues.</p>
+  <p class="warning"><span class="icon">!</span>This documentation is still being written. You can send feedback via email or via Github Issues.</p>
 
   <section>
     <h3 id="introduction">Introduction</h3>
@@ -128,16 +131,6 @@ Rails.application.routes.draw do
   # other routes ...
 end</pre>
 
-    <h4 id="authentication">&raquo; Authentication</h4>
-    <p>
-      LevelUp only provide basic http authentication through Rails 3.1+ <em>http_basic_authenticate_with</em> method. Authentication is disabled by
-      default. To enable it, add these lines in your config/environments/*.rb.
-    </p>
-    <pre class="prettyprint lang-ruby">
-config.level_up.http_authentication = true
-config.level_up.http_login = "your-login"
-config.level_up.http_password = "your-password"</pre>
-
   </section>
 
   <section>
@@ -182,12 +175,18 @@ class HardJob < LevelUp::Job
     # 'second_task' declaration with two transitions
     task :second_task, transitions: [:third_task, :another_task]
 
+    # task class overridden
+    task :third_task, class_name: 'CustomTask', transitions: :end
+
     # you must declare a transition to the 'end' state
-    task :third_task, transitions: :end
     task :another_task, transitions: :end
   end
 end</pre>
     <h4 id="task-methods">&raquo; Task Methods</h4>
+    <p>
+      The most simple way to implement tasks is to define instance methods in job classes. The instance method must have the same name that the task it implements.
+    </p>
+    <p class="info"><span class="icon">i</span>Task instance methods take precedence over any task classes.</p>
     <pre class="prettyprint lang-ruby">
 # app/models/hard_job.rb
 class HardJob < LevelUp::Job
@@ -198,29 +197,33 @@ class HardJob < LevelUp::Job
   # task definition through methods
 
   def first_task
-    # 'first_task' state logic goes here
+    # 'first_task' logic goes here
   end
 
   def second_task
-    # 'second_task' state logic goes here
+    # 'second_task' logic goes here
   end
 
   def third_task
-    # 'third_task' state logic goes here
+    # 'third_task' logic goes here
   end
 
   def another_task
-    # 'another_task' state logic goes here
+    # 'another_task' logic goes here
   end
 end</pre>
-    <h4 id="task-classes">&raquo; State Classes</h4>
-    <p>You can also define task logic in a class instead of a method:</p>
+    <h4 id="task-classes">&raquo; Task Classes</h4>
+    <p>
+      You can also define task logic in a class instead of a method.
+      The class must have the same that the task it implements (camelcased) and be inside a module with the same name that the job it depends.
+      The class must have a <em>run</em> instance method that contains the task logic.
+    </p>
     <pre class="prettyprint lang-ruby">
 # app/models/hard_job/first_task.rb
 module HardJob
   class FirstTask < LevelUp::Task
     def run
-      # 'first_task' state logic goes here
+      # 'first_task' logic goes here
     end
   end
 end</pre>
@@ -258,7 +261,7 @@ end</pre>
 
   <section>
     <h3 id="running-jobs">Running Jobs</h3>
-    <p>In your controllers, models or also in other jobs</p>
+    <p>You can create new jobs in your controllers, models or also in other jobs and start them.</p>
     <h4 id="synchronously">Running Synchronously</h4>
     <p>Execute the job synchronously in the current thread</p>
     <pre class="prettyprint lang-ruby">
@@ -319,6 +322,30 @@ class HardJob < LevelUp::Job
     # backtrace => ['ZeroDivisionError: divided by 0', ...]
   end
 end</pre>
+  </section>
+
+  <section>
+    <h2 id="configuration">Configuration</h2>
+    <h4 id="authentication">&raquo; Authentication</h4>
+    <p>
+      LevelUp only provide basic http authentication through Rails 3.1+ <em>http_basic_authenticate_with</em> method. Authentication is disabled by
+      default. To enable it, add these lines in your config/environments/*.rb.
+    </p>
+    <pre class="prettyprint lang-ruby">
+config.level_up.http_authentication = true
+config.level_up.http_login = "your-login"
+config.level_up.http_password = "your-password"</pre>
+
+    <h4 id="backtrace-size">&raquo; Backtrace Size</h4>
+    <p>
+      When an error is rescued at the job level, the task where the error was raised, the time and a part of the error backtrace is saved as an array of string elements.
+      You can configure the size of the saved backtrace.
+    <pre class="prettyprint lang-ruby">
+# the first ten elements will be saved
+config.level_up.backtrace_size = 10
+
+# disable backtrace
+config.level_up.backtrace_size = 0</pre>
   </section>
 </div>
 

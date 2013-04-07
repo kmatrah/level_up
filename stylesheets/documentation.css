@@ -126,13 +126,39 @@ nav a:hover {
     margin-bottom: 20px;
 }
 
-#content #warning {
+#content .warning, #content .info {
     color: #fff;
-    background-color: #b40d28;
     padding: 10px;
     margin-bottom: 40px;
-    border: 1px solid #9b0d28;
     font-weight: bold;
+}
+
+#content .warning .icon, #content .info .icon {
+    background-color: #fff;
+    padding: 3px 10px;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    margin-right: 10px;
+}
+
+#content .warning {
+    background-color: #b40d28;
+    border: 1px solid #9b0d28;
+}
+
+#content .warning .icon {
+    color: #b40d28;
+}
+
+#content .info {
+    background-color: #3b5998;
+    border: 1px solid #3b3d7a;
+}
+
+#content .info .icon {
+    color: #3b5998;
 }
 
 #content h3 {
