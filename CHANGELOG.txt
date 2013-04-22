@@ -1,3 +1,7 @@
+== 0.3.0 Wave Race
+  * Flowcharts (svg representation of jobs) accessible from the mountable web app
+  * New GraphBuilder class to easily build and customize Graphviz graphs
+
 == 0.2.0 Hungry Beast
   * Configurable size of saved backtrace when rescuing from an error
   * Renamed 'states' into 'tasks'
