@@ -3,11 +3,11 @@ require 'delayed_job_active_record'
 
 
 module LevelUp
-  class TestJob < Job
+  class TestJob < LevelUp::Job
     job do
       task :start, transitions: :first_node
       task :first_node, transitions: [:second_node, :error_node, :timer_node, :task_node]
-      task :second_node, transitions: [:end]
+      task :second_node, transitions: :end
       task :error_node
       task :timer_node
       task :task_node
@@ -33,13 +33,13 @@ module LevelUp
   class CustomTaskError < StandardError
   end
 
-  class CustomTask < Task
+  class CustomTask < LevelUp::Task
     def run
       raise CustomTaskError.new("raised from task #{job.task}")
     end
   end
 
-  class AbstractFirstNode < Task
+  class AbstractFirstNode < LevelUp::Task
     def run
       move_to! :second_node
     end
@@ -48,19 +48,19 @@ module LevelUp
   class TestJob::FirstNode < AbstractFirstNode
   end
 
-  class TestJob::ErrorNode < Task
+  class TestJob::ErrorNode < LevelUp::Task
     def run
       raise "bad news"
     end
   end
 
-  class TestJob::TimerNode < Task
+  class TestJob::TimerNode < LevelUp::Task
     def run
       retry_in! 1.hour
     end
   end
 
-  class TestJob::TaskNode < Task
+  class TestJob::TaskNode < LevelUp::Task
     def run
       manual_task! "a lot of work"
     end

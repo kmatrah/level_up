@@ -10,4 +10,8 @@ LevelUp::Engine.routes.draw do
       get "graphviz"
     end
   end
+
+  resources :flowcharts, only: [:index, :show] do
+    get "graphviz", on: :member
+  end
 end

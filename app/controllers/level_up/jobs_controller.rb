@@ -79,38 +79,15 @@ module LevelUp
     respond_to :svg
     def graphviz
       job = Job.find params[:id]
-      g = GraphViz.new(:G, type: :digraph)
-      g[:bgcolor]= '#fafbfb'
 
-      g.node[:color] = '#111111'
-      g.node[:style] = 'filled'
-      g.node[:shape] = 'box'
-      g.node[:fillcolor] = '#666666'
-      g.node[:fontcolor] = 'white'
-      g.node[:fontname] = 'Verdana'
-      g.edge[:color] = '#000000'
-      g.edge[:arrowhead] = 'open'
-
-      tasks = {}
-      job.tasks.each do |task|
-        tasks[task] = g.add_nodes(task.to_s.humanize.downcase)
-        if task == :start
-          tasks[task][:fillcolor] = '#5db1a4'
-          tasks[task][:color] = '#048282'
-        elsif task == :end
-          tasks[task][:fillcolor] = '#b40d28'
-          tasks[task][:color] = '#600615'
-        end
+      if job
+        builder = GraphBuilder.new(job)
+        graph = builder.graph
+        graph.output(:svg => "#{Rails.root}/tmp/job_#{job.id}.svg")
+        send_data(File.open("#{Rails.root}/tmp/job_#{job.id}.svg").read, filename: "job_#{job.id}.svg", type: 'image/svg+xml', disposition: 'inline')
+      else
+        render text: "Job not found", status: 404
       end
-
-      job.tasks.each do |task|
-        job.transitions(task).each do |transition|
-          g.add_edges(tasks[task], tasks[transition])
-        end
-      end
-
-      g.output(:svg => "#{Rails.root}/tmp/job_#{job.id}.svg")
-      send_data(File.open("#{Rails.root}/tmp/job_#{job.id}.svg").read, filename: "job_#{job.id}.svg", type: 'image/svg+xml', disposition: 'inline')
     end
   end
 end

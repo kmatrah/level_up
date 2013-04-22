@@ -35,7 +35,7 @@ Dummy::Application.configure do
   # Expands the lines which load the assets
   config.assets.debug = true
 
-  config.level_up.http_authentication = true
-  config.level_up.http_login = "admin"
-  config.level_up.http_password = "pwd"
+  #config.level_up.http_authentication = true
+  #config.level_up.http_login = "admin"
+  #config.level_up.http_password = "password"
 end

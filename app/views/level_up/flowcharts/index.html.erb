@@ -1,0 +1,36 @@
+<div class="container-12">
+  <div class="grid-12">
+    <div class="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li> /
+        <li>Flowcharts</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <table class="table-bordered">
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Number of tasks</th>
+          <th>Number of transitions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @job_classes.each do |job_class| %>
+          <tr>
+            <td><%= link_to job_class.name.underscore, flowchart_path(id: job_class.name.underscore) %></td>
+            <td><%= job_class.tasks.size %></td>
+            <td><%= job_class.schema.values.flatten.size %></td>
+          </tr>
+        <% end %>
+        <% if @job_classes.empty? %>
+          <tr>
+            <td colspan="3">No classes found</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

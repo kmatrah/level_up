@@ -1,0 +1,20 @@
+<div class="container-12">
+  <div class="grid-12">
+    <div class="breadcrumbs">
+      <ul>
+        <li><%= link_to "Dashboard", root_path %></li> /
+        <li><%= link_to "Flowcharts", flowcharts_path %></li> /
+        <li><%= @job_type %></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid-12">
+    <div class="simple-panel">
+      <h2>Job Flow</h2>
+      <div class="svg-graph">
+        <object id="svg-object" data="<%= graphviz_flowchart_path(id: @job_type, format: :svg) %>" type="image/svg+xml"></object>
+      </div>
+    </div>
+  </div>
+</div>
