@@ -33,7 +33,7 @@ module LevelUp
   class CustomTaskError < StandardError
   end
 
-  class CustomTask < LevelUp::Task
+  class CustomNode < LevelUp::Task
     def run
       raise CustomTaskError.new("raised from task #{job.task}")
     end
@@ -260,12 +260,13 @@ module LevelUp
     end
 
     test "should use the custom task and raise an error" do
-      %w[start end cancel].each do
-        @custom_task_job.clear!(nil)
+      %w[start end cancel].each do |task|
+        @custom_task_job = CustomTaskJob.create
+        @custom_task_job.task = task
         assert_equal(false, @custom_task_job.error)
         @custom_task_job.boot!
         assert_equal(true, @custom_task_job.error)
-        assert_equal("start", @custom_task_job.failed_in)
+        assert_equal(task, @custom_task_job.failed_in)
       end
     end
 

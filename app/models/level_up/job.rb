@@ -69,27 +69,6 @@ module LevelUp
       end
     end
 
-    def clear!(event_name)
-      clear_timer_attributes
-      clear_error_attributes
-      clear_task_attributes
-
-      self.next_task = nil
-      self.retry_at = nil
-      self.task = event_name if event_name
-      save
-    end
-
-    def step!(event_name, allow_transition, allow_retry)
-      begin
-        run_task(event_name, allow_transition, allow_retry)
-      rescue => ex
-        set_error(ex)
-      ensure
-        save
-      end
-    end
-
     def retry!
       set_timer
       save
@@ -158,6 +137,27 @@ module LevelUp
     end
 
     protected
+      def step!(event_name, allow_transition, allow_retry)
+        begin
+          run_task(event_name, allow_transition, allow_retry)
+        rescue => ex
+          set_error(ex)
+        ensure
+          save
+        end
+      end
+
+      def clear!(event_name)
+        clear_timer_attributes
+        clear_error_attributes
+        clear_task_attributes
+
+        self.next_task = nil
+        self.retry_at = nil
+        self.task = event_name if event_name
+        save
+      end
+
       def run_task(task_name, allow_transition, allow_retry)
         task_name ||= self.task
 
