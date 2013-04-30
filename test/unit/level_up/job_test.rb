@@ -200,13 +200,13 @@ module LevelUp
 
     test "should disallow transition" do
       assert_equal(true, @job.task?(:start))
-      @job.event!(nil, false)
+      @job.boot!(nil, false)
       assert_equal(true, @job.task?(:start))
     end
 
     test "should allow transition" do
       assert_equal(true, @job.task?(:start))
-      @job.event!(nil, true)
+      @job.boot!(nil, true)
       assert_equal(true, @job.task?(:end))
     end
 
@@ -215,7 +215,7 @@ module LevelUp
       assert_nil(@job.retry_at)
       @job.task = "timer_node"
 
-      @job.event!(nil, true, false)
+      @job.boot!(nil, true, false)
       assert_equal(false, @job.timer)
       assert_nil(@job.retry_at)
       assert_nil(@job.delayed_job_id)
@@ -226,7 +226,7 @@ module LevelUp
       assert_nil(@job.retry_at)
       @job.task = "timer_node"
 
-      @job.event!(nil, true, true)
+      @job.boot!(nil, true, true)
       assert_equal(true, @job.timer)
       assert_not_nil(@job.retry_at)
       assert_not_nil(@job.delayed_job_id)

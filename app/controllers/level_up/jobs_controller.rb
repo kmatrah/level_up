@@ -52,7 +52,7 @@ module LevelUp
 
     def run
       job = Job.find params[:id]
-      job.event!(nil, false, false)
+      job.boot!(nil, false, false)
       redirect_to job_path(job), notice: 'Run!'
     end
 

@@ -53,17 +53,13 @@ module LevelUp
       end
     end
 
-    def boot!
-      event!(nil)
-    end
-
-    def event!(event_name, allow_transition=true, allow_retry=true)
+    def boot!(event_name=nil, allow_transition=true, allow_retry=true)
       event_name = event_name.to_s if event_name
       clear!(event_name)
       step!(event_name, allow_transition, allow_retry)
 
       if next_task
-        event!(next_task, allow_transition, allow_retry)
+        boot!(next_task, allow_transition, allow_retry)
       elsif retry_at
         retry!
       end
@@ -78,7 +74,7 @@ module LevelUp
     def boot_async!(event_name=nil, options={})
       begin
         Delayed::Job.transaction do
-          self.delayed_job = delay(options).event!(event_name)
+          self.delayed_job = delay(options).boot!(event_name)
           save
         end
         true
