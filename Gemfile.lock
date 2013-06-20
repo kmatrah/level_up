@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    level_up (0.3.0)
+    level_up (0.3.1)
       delayed_job (~> 3.0)
       delayed_job_active_record (~> 0.3)
       jquery-rails
@@ -68,7 +68,7 @@ GEM
       activerecord (~> 3.1)
       activesupport (~> 3.1)
       polyamorous (~> 0.5.0)
-    mime-types (1.21)
+    mime-types (1.23)
     multi_json (1.6.1)
     polyamorous (0.5.0)
       activerecord (~> 3.0)
@@ -99,7 +99,7 @@ GEM
     rdoc (3.12.1)
       json (~> 1.4)
     ruby-graphviz (1.0.8)
-    sass (3.2.5)
+    sass (3.2.8)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
       sass (>= 3.1.10)
@@ -115,7 +115,7 @@ GEM
     treetop (1.4.12)
       polyglot
       polyglot (>= 0.3.1)
-    tzinfo (0.3.35)
+    tzinfo (0.3.37)
 
 PLATFORMS
   ruby
